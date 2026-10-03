@@ -1,0 +1,25 @@
+[
+ {
+  "type": "result",
+  "duration_ms": 3000,
+  "duration_api_ms": 2500,
+  "is_error": true,
+  "num_turns": 0,
+  "stop_reason": "end_turn",
+  "total_cost_usd": 0,
+  "usage": {
+   "input_tokens": 200,
+   "output_tokens": 80,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0
+  },
+  "modelUsage": {},
+  "permission_denials": [],
+  "uuid": "00000000-0000-4000-8000-0000000020a3",
+  "session_id": "0f0e0d0c-0000-4000-8000-00000000dead",
+  "subtype": "error_during_execution",
+  "errors": [
+   "No conversation found with session ID: 0f0e0d0c-0000-4000-8000-00000000dead (path /srv/secret/projects)"
+  ]
+ }
+]

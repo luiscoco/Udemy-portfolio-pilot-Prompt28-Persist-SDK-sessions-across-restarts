@@ -1,0 +1,30 @@
+{
+  "name": "@portfolio-pilot/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@portfolio-pilot/agent": "0.0.0",
+    "@portfolio-pilot/config": "0.0.0",
+    "@portfolio-pilot/contracts": "0.0.0",
+    "@portfolio-pilot/db": "0.0.0",
+    "better-auth": "1.7.7",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "@portfolio-pilot/providers": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "vitest": "5.0.0"
+  }
+}

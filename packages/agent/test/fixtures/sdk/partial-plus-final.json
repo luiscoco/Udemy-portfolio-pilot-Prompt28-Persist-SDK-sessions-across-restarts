@@ -1,0 +1,183 @@
+[
+ {
+  "type": "system",
+  "subtype": "init",
+  "uuid": "00000000-0000-4000-8000-000000000001",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a",
+  "model": "recorded-model",
+  "tools": [],
+  "mcp_servers": [
+   {
+    "name": "portfolio",
+    "status": "connected"
+   }
+  ],
+  "permissionMode": "dontAsk",
+  "apiKeySource": "ANTHROPIC_API_KEY",
+  "cwd": "/workspace",
+  "slash_commands": [],
+  "output_style": "default"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "message_start",
+   "message": {
+    "id": "msg_01",
+    "type": "message",
+    "role": "assistant",
+    "model": "recorded-model",
+    "content": [],
+    "stop_reason": null,
+    "stop_sequence": null,
+    "usage": {
+     "input_tokens": 120,
+     "output_tokens": 40,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 0
+    }
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000002",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "content_block_start",
+   "index": 0,
+   "content_block": {
+    "type": "text",
+    "text": ""
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000003",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "content_block_delta",
+   "index": 0,
+   "delta": {
+    "type": "text_delta",
+    "text": "Your largest "
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000004",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "content_block_delta",
+   "index": 0,
+   "delta": {
+    "type": "text_delta",
+    "text": "holding is ACME "
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000005",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "content_block_delta",
+   "index": 0,
+   "delta": {
+    "type": "text_delta",
+    "text": "at 1125.00 USD."
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000006",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "content_block_stop",
+   "index": 0
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000007",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "assistant",
+  "message": {
+   "id": "msg_01",
+   "type": "message",
+   "role": "assistant",
+   "model": "recorded-model",
+   "content": [
+    {
+     "type": "text",
+     "text": "Your largest holding is ACME at 1125.00 USD."
+    }
+   ],
+   "stop_reason": null,
+   "stop_sequence": null,
+   "usage": {
+    "input_tokens": 120,
+    "output_tokens": 40,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000008",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "message_delta",
+   "delta": {
+    "stop_reason": "end_turn",
+    "stop_sequence": null
+   },
+   "usage": {
+    "output_tokens": 40
+   }
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000009",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "stream_event",
+  "event": {
+   "type": "message_stop"
+  },
+  "parent_tool_use_id": null,
+  "uuid": "00000000-0000-4000-8000-000000000010",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a"
+ },
+ {
+  "type": "result",
+  "subtype": "success",
+  "duration_ms": 2400,
+  "duration_api_ms": 2100,
+  "is_error": false,
+  "num_turns": 2,
+  "stop_reason": "end_turn",
+  "total_cost_usd": 0.004,
+  "usage": {
+   "input_tokens": 120,
+   "output_tokens": 40,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0
+  },
+  "modelUsage": {},
+  "permission_denials": [],
+  "uuid": "00000000-0000-4000-8000-000000000011",
+  "session_id": "6a1c0b9e-0000-4000-8000-00000000f19a",
+  "result": "Your largest holding is ACME at 1125.00 USD."
+ }
+]

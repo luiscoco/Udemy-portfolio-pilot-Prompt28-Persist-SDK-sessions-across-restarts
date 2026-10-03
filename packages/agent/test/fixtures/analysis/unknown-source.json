@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "news-analysis-v1",
+  "asOf": "2026-10-02T12:00:00.000Z",
+  "articles": [
+    { "articleId": "a1", "title": "Synthetic headline a1", "publishedAt": "2026-10-02T11:30:00.000Z" },
+    { "articleId": "invented-article-77", "title": "A plausible but nonexistent source", "publishedAt": "2026-10-02T09:00:00.000Z" }
+  ],
+  "events": [{ "category": "earnings", "description": "Record quarter reported.", "articleIds": ["invented-article-77"] }],
+  "affectedSecurities": [{ "securityId": "sec-acme", "symbol": "ACME", "relation": "held", "articleIds": ["a1"] }],
+  "factualSummary": [{ "statement": "NOVA reported record revenue.", "articleIds": ["invented-article-77"] }],
+  "interpretations": [],
+  "uncertainties": [{ "statement": "Unverified.", "articleIds": [] }],
+  "evidence": [
+    { "articleId": "a1", "url": "https://attacker.example/a1" },
+    { "articleId": "invented-article-77", "url": "https://example.invalid/invented-article-77" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Analyzer judgments containing a price target and a trade instruction. Both must be rejected as analysis_prohibited_content.",
+  "rawOutputOverrides": {
+    "sentiment": { "label": "positive", "rationale": "Shares could rise to $250 after this report." },
+    "counterpoints": ["Buy now before the next report."]
+  },
+  "expectedIssues": ["sentiment.rationale: price_target", "counterpoints.0: trade_instruction"]
+}

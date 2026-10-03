@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "news-analysis-v1",
+  "asOf": "2026-10-02T12:00:00.000Z",
+  "articles": [
+    { "articleId": "a1", "title": "Synthetic headline a1", "publishedAt": "2026-10-02T11:30:00.000Z" }
+  ],
+  "events": [{ "category": "other", "description": "An event with no citation.", "articleIds": [] }],
+  "affectedSecurities": [],
+  "factualSummary": [
+    { "statement": "A fact without any article reference.", "articleIds": [] },
+    { "statement": "A fact citing an article that was read but is not listed or linked.", "articleIds": ["a1", "a2"] }
+  ],
+  "interpretations": [],
+  "uncertainties": [{ "statement": "Evidence is incomplete.", "articleIds": [] }],
+  "evidence": [{ "articleId": "a1", "url": "https://example.invalid/a1" }]
+}

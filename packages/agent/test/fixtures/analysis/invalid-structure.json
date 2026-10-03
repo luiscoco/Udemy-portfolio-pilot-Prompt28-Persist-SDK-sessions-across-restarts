@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "news-analysis-v1",
+  "asOf": "yesterday",
+  "articles": [{ "articleId": "a1", "title": "Synthetic headline a1", "publishedAt": "2026-10-02T11:30:00.000Z" }],
+  "events": [{ "category": "rumor", "description": "Unlisted category", "articleIds": ["a1"] }],
+  "affectedSecurities": [],
+  "factualSummary": [{ "statement": "NOVA will rise.", "articleIds": ["a1"] }],
+  "interpretations": [{ "statement": "Certain upside.", "confidence": "high", "articleIds": ["a1"] }],
+  "evidence": [{ "articleId": "a1", "url": "https://example.invalid/a1" }],
+  "priceTarget": "150.00"
+}

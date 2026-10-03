@@ -1,0 +1,28 @@
+{
+  "description": "Two fictional reports about the same holding within one day that point in opposite directions. Analyzing the second after the first must yield reassess_assumptions and read_primary_source citing BOTH articles.",
+  "articles": [
+    {
+      "key": "raise",
+      "provider": "portfolio-pilot-mock",
+      "title": "ACME raises full-year guidance after record orders",
+      "summary": "Fictional teaching fixture. ACME says orders increased in the quarter and lifted its outlook.",
+      "publishedHoursAgo": 30,
+      "symbols": ["ACME"],
+      "expected": { "sentiment": "positive", "materiality": "medium", "eventCategories": ["earnings", "guidance", "operations"], "primarySourceRecommended": false }
+    },
+    {
+      "key": "cut",
+      "provider": "portfolio-pilot-mock",
+      "title": "ACME cuts full-year outlook as orders decline",
+      "summary": "Fictional teaching fixture. A competing report says ACME expects weaker demand next quarter.",
+      "publishedHoursAgo": 2,
+      "symbols": ["ACME"],
+      "expected": { "sentiment": "negative", "materiality": "medium", "eventCategories": ["earnings", "guidance", "operations"], "primarySourceRecommended": false }
+    }
+  ],
+  "expectedRecommendations": {
+    "concentratedHolderOfCut": ["monitor_event", "review_concentration", "read_primary_source", "reassess_assumptions"],
+    "diversifiedHolderOfCut": ["monitor_event", "read_primary_source", "reassess_assumptions"],
+    "watcherOfCut": ["monitor_event", "read_primary_source"]
+  }
+}

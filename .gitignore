@@ -1,0 +1,52 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+
+# Dependencies and generated application output
+node_modules/
+**/node_modules/
+.npm-cache/
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+coverage/
+**/coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+**/generated/prisma/
+
+# Claude Agent SDK session artifacts and transcripts
+.claude/
+**/.claude/
+.claude-agent-sdk/
+**/.claude-agent-sdk/
+sdk-transcripts/
+**/sdk-transcripts/
+*.transcript.jsonl
+
+# Local database files and volumes
+.data/
+data/postgres/
+data/redis/
+postgres-data/
+redis-data/
+*.sqlite
+*.sqlite-journal
+
+# Local operating-system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.local/
+
+# Workspace-only build and verification caches
+.cache/

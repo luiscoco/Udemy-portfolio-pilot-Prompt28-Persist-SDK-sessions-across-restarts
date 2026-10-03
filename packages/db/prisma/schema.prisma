@@ -1,0 +1,525 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum TransactionSide {
+  BUY
+  SELL
+}
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  emailVerified Boolean @default(false)
+  image String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  sessions Session[]
+  accounts Account[]
+  portfolios Portfolio[]
+  watchlist WatchlistEntry[]
+  outboxEvents OutboxEvent[]
+  newsReads NewsRead[]
+  conversations Conversation[]
+  portfolioImpacts PortfolioImpact[]
+  recommendations Recommendation[]
+  approvals ApprovalRequest[]
+  alertRules AlertRule[]
+  alertNotifications AlertNotification[]
+  agentBudgets DailyAgentBudget[]
+}
+
+model Conversation {
+  id String @id @default(cuid())
+  ownerId String
+  title String @db.VarChar(100)
+  portfolioId String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+  runs AgentRun[]
+  leaseOwner String?
+  leaseUntil DateTime? @db.Timestamptz(3)
+  leaseRunId String?
+  session ConversationSession?
+  @@index([ownerId, createdAt, id])
+}
+
+/// Current completed-turn checkpoint. Raw SDK state stays in private artifact storage.
+model ConversationSession {
+  conversationId String @id
+  sdkSessionId String @db.VarChar(64)
+  agentMode String @db.VarChar(16)
+  hostKey String @db.VarChar(64)
+  instructionVersion String @db.VarChar(64)
+  modelKey String @db.VarChar(128)
+  generation Int @default(1)
+  lastRunId String?
+  artifactKey String?
+  artifactSha256 String? @db.VarChar(64)
+  artifactExpiresAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+/// One streamed assistant answer. A partial unique index (migration) allows one running run per conversation.
+model AgentRun {
+  id String @id
+  conversationId String
+  userMessageId String @unique
+  /// Application message ID used by stream events; the ChatMessage row is created with it exactly once.
+  assistantMessageId String @unique
+  status String @db.VarChar(32)
+  kind String @default("answer") @db.VarChar(16)
+  /// SDK attempts made (resume fallback and analysis validation retries are bounded).
+  approvals ApprovalRequest[]
+  attempts Int @default(0)
+  attempt Int @default(0)
+  leaseOwner String?
+  leaseUntil DateTime? @db.Timestamptz(3)
+  heartbeatAt DateTime? @db.Timestamptz(3)
+  executionStartedAt DateTime? @db.Timestamptz(3)
+  nextSequence Int @default(0)
+  progressBytes Int @default(0)
+  chunks AgentRunChunk[]
+  failureCode String? @db.VarChar(32)
+  budgetDay String? @db.VarChar(10)
+  reservedUsd Decimal @default(0) @db.Decimal(18, 6)
+  chargedUsd Decimal? @db.Decimal(18, 6)
+  usage Json?
+  actualModel String? @db.VarChar(128)
+  cancelRequestedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  completedAt DateTime? @db.Timestamptz(3)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  @@index([conversationId, createdAt])
+  @@index([status, createdAt])
+}
+
+/// UTC day ledger. Atomic conditional reservation includes all outstanding runs.
+model DailyAgentBudget {
+  ownerId String
+  day String @db.VarChar(10)
+  reservedUsd Decimal @default(0) @db.Decimal(18, 6)
+  chargedUsd Decimal @default(0) @db.Decimal(18, 6)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  @@id([ownerId, day])
+}
+
+model ChatMessage {
+  id String @id @default(cuid())
+  conversationId String
+  sequence BigInt @unique @default(autoincrement())
+  role String @db.VarChar(16)
+  content String @db.VarChar(16000)
+  status String @db.VarChar(16)
+  mode String? @db.VarChar(16)
+  instructionVersion String? @db.VarChar(64)
+  sources Json @default("[]")
+  kind String @default("answer") @db.VarChar(16)
+  /// Server-validated news-analysis-v1 document (null unless kind = news_analysis and completed).
+  analysis Json?
+  /// SessionContinuity: new | resumed | reseeded (+ reason). Null for user messages.
+  continuity Json?
+  usage Json?
+  actualModel String? @db.VarChar(128)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  @@index([conversationId, sequence])
+}
+model Session {
+  id String @id @default(cuid())
+  token String @unique
+  userId String
+  expiresAt DateTime @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
+}
+model Account {
+  id String @id @default(cuid())
+  accountId String
+  providerId String
+  userId String
+  accessToken String?
+  refreshToken String?
+  idToken String?
+  accessTokenExpiresAt DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope String?
+  password String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+model Verification {
+  id String @id @default(cuid())
+  identifier String
+  value String
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@index([identifier])
+  @@index([expiresAt])
+}
+model Portfolio {
+  id String @id @default(cuid())
+  ownerId String
+  name String
+  currency String @default("USD") @db.VarChar(3)
+  archivedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  transactions PortfolioTransaction[]
+  @@unique([ownerId, name])
+  @@index([ownerId, createdAt, id])
+}
+model Security {
+  id String @id @default(cuid())
+  symbol String @db.VarChar(32)
+  exchangeMic String @db.Char(4)
+  name String
+  currency String @default("USD") @db.VarChar(3)
+  assetType String @default("STOCK")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  transactions PortfolioTransaction[]
+  watchlist WatchlistEntry[]
+  quotes QuoteSnapshot[]
+  news NewsArticleSecurity[]
+  @@unique([exchangeMic, symbol])
+  @@index([symbol])
+}
+model PortfolioTransaction {
+  id String @id @default(cuid())
+  ledgerOrder BigInt @unique @default(autoincrement())
+  idempotencyKey String? @db.VarChar(128)
+  requestFingerprint String? @db.VarChar(64)
+  portfolioId String
+  securityId String
+  side TransactionSide
+  quantity Decimal @db.Decimal(28, 10)
+  price Decimal @db.Decimal(28, 10)
+  fees Decimal @default(0) @db.Decimal(28, 10)
+  amount Decimal @db.Decimal(38, 10)
+  occurredAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  security Security @relation(fields: [securityId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  @@index([portfolioId, occurredAt, id])
+  @@index([portfolioId, securityId, occurredAt, id])
+  @@index([securityId])
+  @@unique([portfolioId, idempotencyKey])
+  @@index([portfolioId, occurredAt, ledgerOrder], map: "PortfolioTransaction_ledger_page")
+}
+model WatchlistEntry {
+  id String @id @default(cuid())
+  ownerId String
+  securityId String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  security Security @relation(fields: [securityId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  @@unique([ownerId, securityId])
+  @@index([ownerId, createdAt, id])
+  @@index([securityId])
+}
+model QuoteSnapshot {
+  id String @id @default(cuid())
+  securityId String
+  provider String
+  asOf DateTime @db.Timestamptz(3)
+  price Decimal @db.Decimal(28, 10)
+  currency String @default("USD") @db.VarChar(3)
+  isSynthetic Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  security Security @relation(fields: [securityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([securityId, provider, asOf])
+  @@index([securityId, asOf])
+}
+model NewsArticle {
+  id String @id @default(cuid())
+  provider String
+  providerArticleId String
+  title String
+  summary String
+  url String
+  canonicalKey String? @unique
+  acceptedObservationId String?
+  publishedAt DateTime @db.Timestamptz(3)
+  isSynthetic Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  securities NewsArticleSecurity[]
+  observations NewsObservation[]
+  sources NewsSource[]
+  urls NewsUrl[]
+  reads NewsRead[]
+  analyses ArticleAnalysis[]
+  impacts PortfolioImpact[]
+  @@unique([provider, providerArticleId])
+  @@index([publishedAt, id])
+}
+
+model IngestionState {
+  key String @id
+  checkpoint String?
+  cursor String?
+  mockStartAt DateTime @default(now()) @db.Timestamptz(3)
+  leaseOwner String?
+  leaseUntil DateTime? @db.Timestamptz(3)
+  generation Int @default(0)
+  failures Int @default(0)
+  nextRunAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+// Immutable normalized observations; no raw vendor body or full article text.
+model NewsObservation {
+  id String @id
+  articleId String
+  provider String
+  recordId String
+  fingerprint String
+  providerAt DateTime @db.Timestamptz(3)
+  observedAt DateTime @default(now()) @db.Timestamptz(3)
+  metadata Json
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([provider, recordId, fingerprint])
+  @@index([articleId, providerAt])
+}
+
+model NewsSource {
+  provider String
+  recordId String
+  articleId String
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@id([provider, recordId])
+  @@index([articleId])
+}
+
+model NewsUrl {
+  url String @id
+  articleId String
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@index([articleId])
+}
+model NewsArticleSecurity {
+  newsArticleId String
+  securityId String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  article NewsArticle @relation(fields: [newsArticleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  security Security @relation(fields: [securityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@id([newsArticleId, securityId])
+  @@index([securityId, newsArticleId])
+}
+
+model NewsRead {
+  ownerId String
+  articleId String
+  readAt DateTime @default(now()) @db.Timestamptz(3)
+  readRevisionAt DateTime @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  @@id([ownerId, articleId])
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  DEAD
+}
+
+// Transactional outbox: written in the same PostgreSQL transaction as the domain change.
+// id is the stable domain event UUID; streamEntryId is only the Redis delivery cursor.
+model OutboxEvent {
+  id String @id @db.Uuid
+  sequence BigInt @unique @default(autoincrement())
+  type String @db.VarChar(64)
+  schemaVersion Int
+  occurredAt DateTime @db.Timestamptz(3)
+  audience String @db.VarChar(16)
+  ownerId String?
+  portfolioId String?
+  entityType String @db.VarChar(64)
+  entityId String
+  payload Json
+  status OutboxStatus @default(PENDING)
+  attempts Int @default(0)
+  // Stamped by PostgreSQL, never the app clock: the claim query compares it with clock_timestamp().
+  availableAt DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz(3)
+  leaseOwner String?
+  leaseUntil DateTime? @db.Timestamptz(3)
+  claimToken String? @db.Uuid
+  publishedAt DateTime? @db.Timestamptz(3)
+  streamKey String?
+  streamEntryId String?
+  lastError String? @db.VarChar(500)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@index([status, availableAt, sequence], map: "OutboxEvent_dispatch")
+  @@index([ownerId, sequence])
+  @@index([status, publishedAt])
+}
+
+/// Milestone 21. SHARED, user-independent analysis of one article revision. It never holds owner data:
+/// the analyzer sees only public article fields. Unique by cacheKey = sha256(articleId, revisionKey,
+/// promptVersion, schemaVersion, modelKey); a duplicate delivery of the same content reuses this row.
+model ArticleAnalysis {
+  id String @id
+  cacheKey String @unique @db.Char(64)
+  articleId String
+  /// sha256 of the accepted title, summary, canonical URL, publication time and linked symbols.
+  revisionKey String @db.Char(64)
+  observationId String?
+  promptVersion String @db.VarChar(64)
+  schemaVersion String @db.VarChar(64)
+  modelKey String @db.VarChar(128)
+  analyzerMode String @db.VarChar(16)
+  /// pending (claimed, lease-fenced) | completed | failed (retryable after retryAfter)
+  status String @db.VarChar(16)
+  failureCode String? @db.VarChar(40)
+  attempts Int @default(0)
+  analysis Json?
+  /// Public source snapshot used for the analysis (URL, provider, title, publication time).
+  source Json
+  claimToken String? @db.Uuid
+  leaseUntil DateTime? @db.Timestamptz(3)
+  retryAfter DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  completedAt DateTime? @db.Timestamptz(3)
+  /// Set when the article's accepted revision changes; the row stays as provenance history.
+  supersededAt DateTime? @db.Timestamptz(3)
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  impacts PortfolioImpact[]
+  @@index([articleId, createdAt])
+}
+
+/// PRIVATE: the latest deterministic exposure of one owner's holdings to one article.
+model PortfolioImpact {
+  id String @id @default(cuid())
+  ownerId String
+  articleId String
+  analysisId String?
+  revisionKey String @db.Char(64)
+  /// sha256 of the owner's open positions (portfolio, security, quantity) and watchlist securities.
+  portfolioFingerprint String @db.Char(64)
+  relevance String @db.VarChar(16)
+  exposure Json
+  generatorVersion String @db.VarChar(64)
+  computedAt DateTime @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  article NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  analysis ArticleAnalysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  @@unique([ownerId, articleId])
+}
+
+/// PRIVATE, owner-scoped research recommendation with provenance. Never a trade or a price target.
+/// A GIN index on evidenceArticleIds (migration, SQL only) supports invalidation when a cited article changes.
+model Recommendation {
+  disposition String @default("new") @db.VarChar(16)
+  id String @id @default(cuid())
+  ownerId String
+  articleId String
+  type String @db.VarChar(32)
+  /// active | stale (inputs changed; see staleReasons) | superseded (replaced by a recalculation)
+  status String @db.VarChar(16)
+  staleReasons Json @default("[]")
+  /// sha256 of the rule version, type, analyses, article revisions, portfolio fingerprint and securities.
+  dedupeKey String @db.Char(64)
+  payload Json
+  analysisIds String[]
+  evidenceArticleIds String[]
+  /// { articleId: revisionKey } for every cited article, as analyzed.
+  revisionKeys Json
+  promptVersion String @db.VarChar(64)
+  schemaVersion String @db.VarChar(64)
+  modelKey String @db.VarChar(128)
+  portfolioFingerprint String @db.Char(64)
+  generatorVersion String @db.VarChar(64)
+  asOf DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  supersededAt DateTime? @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([ownerId, dedupeKey])
+  @@index([ownerId, status, createdAt])
+  @@index([ownerId, articleId])
+}
+
+model AlertRule {
+  id String @id @default(cuid())
+  ownerId String
+  name String @db.VarChar(100)
+  enabled Boolean @default(true)
+  revision Int @default(1)
+  categories String[]
+  securityIds String[]
+  concentrationThreshold Decimal? @db.Decimal(11, 10)
+  relevanceThreshold Decimal? @db.Decimal(11, 10)
+  cooldownSeconds Int @default(300)
+  lastNotifiedAt DateTime? @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  notifications AlertNotification[]
+  @@index([ownerId, deletedAt])
+}
+
+model AlertNotification {
+  id String @id @default(cuid())
+  ownerId String
+  ruleId String
+  ruleRevision Int
+  articleId String
+  eventRevision String @db.Char(64)
+  title String
+  recommendationIds String[]
+  suppressed Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  dismissedAt DateTime? @db.Timestamptz(3)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  rule AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  @@unique([ownerId, ruleId, ruleRevision, articleId, eventRevision])
+  @@index([ownerId, createdAt, id])
+}
+
+model ApprovalRequest {
+ id String @id
+ ownerId String
+ runId String
+ actionType String @db.VarChar(32)
+ arguments Json
+ argumentHash String @db.Char(64)
+ before Json
+ mutationId String @unique
+ status String @db.VarChar(16)
+ expiresAt DateTime @db.Timestamptz(3)
+ createdAt DateTime @default(now()) @db.Timestamptz(3)
+ consumedAt DateTime? @db.Timestamptz(3)
+ owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+ run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+ @@index([ownerId, runId, createdAt])
+}
+
+model AgentRunChunk {
+  runId String
+  sequence Int
+  event Json
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  @@id([runId, sequence])
+}

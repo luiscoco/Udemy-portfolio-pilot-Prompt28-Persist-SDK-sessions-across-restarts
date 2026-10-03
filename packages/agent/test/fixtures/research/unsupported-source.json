@@ -1,0 +1,15 @@
+{
+  "description": "Analyzer output that cites an article and URL other than the one analyzed. It must be rejected as analysis_unknown_source; it is never cached as completed and never reaches a recommendation.",
+  "rawOutputOverrides": {
+    "sources": [
+      { "articleId": "{{articleId}}", "url": "{{url}}" },
+      { "articleId": "invented-article", "url": "https://attacker.example/invented" }
+    ]
+  },
+  "unsupportedProviderArticle": {
+    "provider": "unknown-blog",
+    "title": "ACME rumor from an unvetted blog",
+    "summary": "Fictional teaching fixture. An unsupported source makes an unverified claim.",
+    "symbols": ["ACME"]
+  }
+}

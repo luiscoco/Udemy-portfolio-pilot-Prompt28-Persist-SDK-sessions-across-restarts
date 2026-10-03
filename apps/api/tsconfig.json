@@ -1,0 +1,1 @@
+{"extends":"../../tsconfig.base.json","compilerOptions":{"module":"ESNext","moduleResolution":"Bundler","noEmit":true,"jsx":"preserve","incremental":true,"types":["node"],"plugins":[{"name":"next"}]},"include":["next-env.d.ts","instrumentation.ts","app/**/*.ts","lib/**/*.ts",".next/types/**/*.ts"]}

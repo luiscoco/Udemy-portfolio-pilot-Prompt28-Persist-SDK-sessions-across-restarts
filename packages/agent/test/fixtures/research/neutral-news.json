@@ -1,0 +1,12 @@
+{
+  "description": "Fictional, purely descriptive news. The analysis must be neutral with no materiality, and no recommendation may be generated for any owner, including a concentrated holder.",
+  "article": {
+    "key": "conference",
+    "provider": "portfolio-pilot-mock",
+    "title": "ACME to present at an industry conference",
+    "summary": "Fictional teaching fixture. The company will present at a scheduled industry conference. No figures were disclosed.",
+    "publishedHoursAgo": 1,
+    "symbols": ["ACME"]
+  },
+  "expected": { "sentiment": "neutral", "materiality": "none", "eventCategories": ["other"], "primarySourceRecommended": false, "recommendations": [] }
+}

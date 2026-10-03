@@ -1,0 +1,44 @@
+[
+ {
+  "type": "system",
+  "subtype": "init",
+  "uuid": "00000000-0000-4000-8000-0000000020a1",
+  "session_id": "5b3f2c1a-8d4e-4f6b-9a7c-2e1d0f9b8a6c",
+  "model": "recorded-model",
+  "tools": [],
+  "mcp_servers": [
+   {
+    "name": "portfolio",
+    "status": "connected"
+   }
+  ],
+  "permissionMode": "dontAsk",
+  "apiKeySource": "ANTHROPIC_API_KEY",
+  "cwd": "/workspace",
+  "slash_commands": [],
+  "output_style": "default"
+ },
+ {
+  "type": "result",
+  "duration_ms": 3000,
+  "duration_api_ms": 2500,
+  "is_error": true,
+  "num_turns": 3,
+  "stop_reason": "end_turn",
+  "total_cost_usd": 0.006,
+  "usage": {
+   "input_tokens": 200,
+   "output_tokens": 80,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0
+  },
+  "modelUsage": {},
+  "permission_denials": [],
+  "uuid": "00000000-0000-4000-8000-0000000020a3",
+  "session_id": "5b3f2c1a-8d4e-4f6b-9a7c-2e1d0f9b8a6c",
+  "subtype": "error_max_structured_output_retries",
+  "errors": [
+   "Output did not match schema after 5 attempts: /priceTarget unexpected (internal detail sk-ant-placeholder)"
+  ]
+ }
+]

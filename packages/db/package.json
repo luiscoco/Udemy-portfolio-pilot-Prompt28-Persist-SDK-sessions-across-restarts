@@ -1,0 +1,37 @@
+{
+    "name":  "@portfolio-pilot/db",
+    "version":  "0.0.0",
+    "private":  true,
+    "type":  "module",
+    "exports":  {
+                    ".":  {
+                              "types":  "./dist/index.d.ts",
+                              "default":  "./dist/index.js"
+                          }
+                },
+    "scripts":  {
+                    "generate":  "prisma generate --schema prisma/schema.prisma",
+                    "build":  "npm run generate \u0026\u0026 tsc -p tsconfig.json",
+                    "typecheck":  "tsc -p tsconfig.json --noEmit",
+                    "lint":  "tsc -p tsconfig.json --noEmit",
+                    "test":  "vitest run --passWithNoTests",
+                    "migrate:deploy":  "prisma migrate deploy",
+                    "migrate:dev":  "prisma migrate dev",
+                    "seed:demo":  "node dist/seed-cli.js",
+                    "verify:database":  "node test/verify-database.mjs"
+                },
+    "dependencies":  {
+                         "@portfolio-pilot/contracts":  "0.0.0",
+                         "@portfolio-pilot/domain":  "0.0.0",
+                         "@prisma/client":  "7.10.0",
+                         "@prisma/adapter-pg":  "7.10.0",
+                         "pg":  "8.16.3",
+                         "redis":  "5.10.0",
+                         "@portfolio-pilot/providers":  "0.0.0"
+                     },
+    "devDependencies":  {
+                            "prisma":  "7.10.0",
+                            "vitest":  "5.0.0",
+                            "@types/pg":  "8.15.5"
+                        }
+}

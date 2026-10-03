@@ -1,0 +1,27 @@
+{
+  "name": "portfolio-pilot",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.21.0 <25",
+    "npm": ">=11.19.0 <12"
+  },
+  "packageManager": "npm@11.19.0",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "infra:start": "node scripts/infra.mjs start",
+    "infra:stop": "node scripts/infra.mjs stop",
+    "infra:status": "node scripts/infra.mjs status",
+    "infra:inspect": "node scripts/infra.mjs inspect",
+    "infra:reset": "node scripts/infra.mjs reset",
+    "build": "node scripts/run-workspaces.mjs build",
+    "typecheck": "node scripts/run-workspaces.mjs typecheck",
+    "build:types": "node scripts/run-workspaces.mjs build:types",
+    "lint": "node scripts/run-workspaces.mjs lint",
+    "test": "node scripts/run-workspaces.mjs test",
+    "check:browser-boundary": "node scripts/check-browser-boundary.mjs"
+  },
+  "devDependencies": {"typescript": "5.9.3", "@types/node": "24.10.0"}
+}
