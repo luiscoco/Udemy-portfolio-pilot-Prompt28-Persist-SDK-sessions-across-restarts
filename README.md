@@ -1,4 +1,4 @@
-# PortfolioPilot — Milestone 28: Persist SDK Sessions Across Restarts
+# Persist SDK Sessions Across Restarts
 
 This learning activity adds durable conversation checkpoints to PortfolioPilot, a stock portfolio
 manager with portfolio-aware chat and cited news. A **checkpoint** is a saved copy of the assistant's
